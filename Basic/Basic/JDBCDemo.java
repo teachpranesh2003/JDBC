@@ -4,15 +4,16 @@ import java.util.concurrent.Callable;
 public class JDBCDemo {
   
     public static void main(String args[]) throws Exception{
-      //  InsertDBHardcODE();
-      //  InsertDBVar() ;
-      //  readDB();
-      //  InsertDBPreparedST();
-      //  DeleteDB();
-      //  UpdateDB();
-     // StoredProParaIn();
-     StoredProParaOut();
-     Autocommite();
+    //    InsertDBHardcODE();
+    //    InsertDBVar() ;
+    //    readDB();
+    //    InsertDBPreparedST();
+    //    DeleteDB();
+    //    UpdateDB();
+    //  StoredProParaIn();
+    //  StoredProParaOut();
+    //  Autocommite();
+     RollbackBatchingMeth();
 
     }
       public static void readDB() throws Exception{
@@ -192,7 +193,44 @@ public class JDBCDemo {
       
       }
 
-       
+      public static void RollbackBatchingMeth() throws Exception{
+         String url = "jdbc:mysql://localhost:3306/Jdbc";
+        String username = "root";
+        String password = "25022003#pP";
+        
+        String query = "update employee set salary = 100000 where id = 134";
+        String query1 = "update employee set salary = 100000 where id = 135";
+        String query2 = "update employee set salary = 100000 where id =151";
+        String query3 = "update employee set salary = 100000 where id =152";
+
+        Connection con = DriverManager.getConnection(url, username, password);
+        con.setAutoCommit(false);
+        Statement st = con.createStatement();
+        
+        st.addBatch(query1);
+        st.addBatch(query);
+        st.addBatch(query2);
+        st.addBatch(query3);
+
+        int res[]=st.executeBatch(); // it returns array of no of rows affected count
+        
+        // here we dont need to affect databse when there is a error 
+        // but in this itis array of numbers so we use roolback function
+
+        for(int i : res){
+          if(i>0){
+              System.out.println(i);
+             continue;}
+          else
+            con.rollback();// here it is connection based DB chaneg so we use con
+        }
+        con.commit();
+        con.close();
+
+        
+          
+
+      } 
        
 
     }
